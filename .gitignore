@@ -109,6 +109,3 @@ $RECYCLE.BIN/
 
 # pyenv
 .python-version
-
-# poetry
-poetry.lock
