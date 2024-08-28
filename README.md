@@ -1,6 +1,3 @@
-# fastapi
-
-
 ## 디렉토리 및 파일 설명
 
 ### `app/`
@@ -26,3 +23,14 @@ Poetry를 사용하여 Python 프로젝트의 의존성 및 설정을 정의하�
 
 ### `poetry.lock`
 Poetry가 의존성 버전을 고정하기 위해 사용하는 파일입니다.
+
+## 설치 및 실행 방법
+
+### Docker를 사용한 설치
+
+1. **Docker 및 Docker Compose가 설치되어 있어야 합니다.**
+
+2. **Docker Compose로 컨테이너 빌드 및 실행**
+
+   ```bash
+   docker-compose up --build
