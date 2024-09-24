@@ -1,21 +1,18 @@
 from sqlalchemy.orm import Session, selectinload
 from app import models, schemas
 from typing import List
-from sqlalchemy import text, select
+from sqlalchemy import text
 
 
 def search_companies(db: Session, query: str, language: str) -> List[models.Company]:
     companies = (
-        db.execute(
-            select(models.Company)
-            .join(models.Company.names)
-            .options(selectinload(models.Company.names))
-            .filter(
-                models.CompanyName.company_name.like(f"%{query}%"),
-                models.CompanyName.language == language,
-            )
+        db.query(models.Company)
+        .join(models.Company.names)
+        .options(selectinload(models.Company.names))
+        .filter(
+            models.CompanyName.company_name.like(f"%{query}%"),
+            models.CompanyName.language == language,
         )
-        .scalars()
         .all()
     )
 
@@ -56,17 +53,14 @@ def get_company_by_name(
     db: Session, company_name: str, language: str
 ) -> models.Company:
     company = (
-        db.execute(
-            select(models.Company)
-            .join(models.Company.names)
-            .join(models.Company.tags)
-            .options(selectinload(models.Company.names))
-            .options(selectinload(models.Company.tags))
-            .filter(
-                models.CompanyName.company_name == company_name,
-            )
+        db.query(models.Company)
+        .join(models.Company.names)
+        .join(models.Company.tags)
+        .options(selectinload(models.Company.names))
+        .options(selectinload(models.Company.tags))
+        .filter(
+            models.CompanyName.company_name == company_name,
         )
-        .scalars()
         .first()
     )
 
@@ -78,6 +72,7 @@ def format_company_detail(
 ) -> schemas.CompanyDetail:
     company_name = ""
     tags = []
+
     for item in company.names:
         if item.language == language:
             company_name = item.company_name
@@ -124,17 +119,16 @@ def search_companies_by_tag(db: Session, tag: str) -> models.Company:
     """
     )
 
-    result = db.execute(query, {"tag": tag}).all()
-    company_ids = [row[0] for row in result]
+    result = db.execute(query, {"tag": tag}).scalars().all()
 
-    query = (
-        select(models.Company)
+    company = (
+        db.query(models.Company)
         .join(models.Company.names)
         .options(selectinload(models.Company.names))
-        .filter(models.Company.id.in_(company_ids))
+        .filter(models.Company.id.in_(result))
+        .all()
     )
 
-    company = db.execute(query).unique().scalars().all()
     return company
 
 
